@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 
 const ToDoList = () => {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState({
+    label: "",
+  });
+
   const [tasks, setTasks] = useState([]);
   // const [info, setInfo] = useState([]);
 
@@ -24,24 +27,48 @@ const ToDoList = () => {
   }, []);
 
   function handleChange(e) {
-    setInputValue(e.target.value);
+    setInputValue({ ...inputValue, [e.target.name]: e.target.value });
+    console.log("inputvalue.....", inputValue);
+    console.log("e.target.value", e.target.value);
+    console.log("[e.target.name]", [e.target.name]);
   }
 
-  function handleKeyDown(e) {
-    if (e.key === "Enter" && inputValue.trim()) {
-      setTasks([...tasks, inputValue.trim()]);
-      setInputValue("");
+  async function handleKeyDown(e) {
+    if (e.key === "Enter") {
+      // && inputValue.label.trim()
+      console.log("Esto es event...", e);
+
+      // console.log("Input value:", inputValue);
+      const response = await fetch(
+        "https://playground.4geeks.com/todo/todos/Angie_Vanegas",
+        {
+          method: "POST",
+          body: JSON.stringify({ label: inputValue.label }),
+          headers: {
+            "Content-type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        console.log(response);
+        const postData = await response.json();
+        setTasks([...tasks, { label: inputValue.label, id: postData.id }]);
+        console.log("esto es postdata.....", postData);
+        setInputValue({ label: "" });
+      } else {
+        console.log("No se puede crear");
+      }
     }
   }
 
   function handleRemove(removeTask) {
-    const deleteTask = tasks.filter((_, index) => {
-      return index !== removeTask;
+    const deleteTask = tasks.filter((task) => {
+      console.log("este elementttoooo", task);
+      return task.id !== removeTask;
     });
     setTasks(deleteTask);
   }
-
-  //  https://playground.4geeks.com/todo/todos/Angie_Vanegas
 
   return (
     <div className="mt-5 m-5 p-5">
@@ -49,7 +76,8 @@ const ToDoList = () => {
         type="text"
         className="todolistInput form-control"
         placeholder="¿Whats needs to be done?"
-        value={inputValue}
+        name="label"
+        value={inputValue.label}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
       />
@@ -60,12 +88,12 @@ const ToDoList = () => {
           </div>
         ) : null}
         <ol className="list-group">
-          {tasks.map((task, index) => (
-            <li className="fontList list-group-item" key={index}>
+          {tasks.map((task) => (
+            <li className="fontList list-group-item" key={task.id}>
               <div className="task-container">
                 <span className="task-text">{task.label}</span>
                 <span
-                  onClick={() => handleRemove(index)}
+                  onClick={() => handleRemove(task.id)}
                   className="remove-icon"
                 >
                   X
