@@ -1,8 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const ToDoList = () => {
   const [inputValue, setInputValue] = useState("");
   const [tasks, setTasks] = useState([]);
+  // const [info, setInfo] = useState([]);
+
+  async function getInfo() {
+    try {
+      const response = await fetch(
+        "https://playground.4geeks.com/todo/users/Angie_Vanegas"
+      );
+      const data = await response.json();
+      setTasks(data.todos);
+      console.log("esto es data.todos.....", data.todos);
+      console.log("esto es data.....", data);
+    } catch (e) {
+      console.log("se borró la bd.......", e);
+    }
+  }
+
+  useEffect(() => {
+    getInfo();
+  }, []);
 
   function handleChange(e) {
     setInputValue(e.target.value);
@@ -21,6 +40,8 @@ const ToDoList = () => {
     });
     setTasks(deleteTask);
   }
+
+  //  https://playground.4geeks.com/todo/todos/Angie_Vanegas
 
   return (
     <div className="mt-5 m-5 p-5">
@@ -42,7 +63,7 @@ const ToDoList = () => {
           {tasks.map((task, index) => (
             <li className="fontList list-group-item" key={index}>
               <div className="task-container">
-                <span className="task-text">{task}</span>
+                <span className="task-text">{task.label}</span>
                 <span
                   onClick={() => handleRemove(index)}
                   className="remove-icon"
