@@ -1,3 +1,4 @@
+// import { func } from "prop-types";
 import React, { useState, useEffect } from "react";
 
 const ToDoList = () => {
@@ -6,7 +7,6 @@ const ToDoList = () => {
   });
 
   const [tasks, setTasks] = useState([]);
-  // const [info, setInfo] = useState([]);
 
   async function getInfo() {
     try {
@@ -14,9 +14,8 @@ const ToDoList = () => {
         "https://playground.4geeks.com/todo/users/Angie_Vanegas"
       );
       const data = await response.json();
+      console.log("esto es dataaaaa...", data);
       setTasks(data.todos);
-      console.log("esto es data.todos.....", data.todos);
-      console.log("esto es data.....", data);
     } catch (e) {
       console.log("se borró la bd.......", e);
     }
@@ -28,17 +27,10 @@ const ToDoList = () => {
 
   function handleChange(e) {
     setInputValue({ ...inputValue, [e.target.name]: e.target.value });
-    console.log("inputvalue.....", inputValue);
-    console.log("e.target.value", e.target.value);
-    console.log("[e.target.name]", [e.target.name]);
   }
 
   async function handleKeyDown(e) {
     if (e.key === "Enter") {
-      // && inputValue.label.trim()
-      console.log("Esto es event...", e);
-
-      // console.log("Input value:", inputValue);
       const response = await fetch(
         "https://playground.4geeks.com/todo/todos/Angie_Vanegas",
         {
@@ -62,7 +54,30 @@ const ToDoList = () => {
     }
   }
 
+  async function deletePost(id) {
+    try {
+      const response = await fetch(
+        `https://playground.4geeks.com/todo/todos/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (response.ok) {
+        console.log("esto es response.....", response);
+      } else {
+        throw new Error("No se pudo borrar la tarea");
+      }
+      const data = await response.json();
+      const newTasksList = tasks.filter((task) => task.id !== id);
+      setTasks(newTasksList);
+      console.log(data);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   function handleRemove(removeTask) {
+    deletePost(removeTask);
     const deleteTask = tasks.filter((task) => {
       console.log("este elementttoooo", task);
       return task.id !== removeTask;
