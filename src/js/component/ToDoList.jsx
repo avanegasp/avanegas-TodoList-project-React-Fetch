@@ -1,4 +1,3 @@
-// import { func } from "prop-types";
 import React, { useState, useEffect } from "react";
 
 const ToDoList = () => {
@@ -14,10 +13,9 @@ const ToDoList = () => {
         "https://playground.4geeks.com/todo/users/Angie_Vanegas"
       );
       const data = await response.json();
-      console.log("esto es dataaaaa...", data);
       setTasks(data.todos);
     } catch (e) {
-      console.log("se borró la bd.......", e);
+      console.log(e);
     }
   }
 
@@ -30,7 +28,12 @@ const ToDoList = () => {
   }
 
   async function handleKeyDown(e) {
-    if (e.key === "Enter") {
+    if (
+      e.key === "Enter" &&
+      inputValue &&
+      typeof inputValue.label === "string" &&
+      inputValue.label.trim()
+    ) {
       const response = await fetch(
         "https://playground.4geeks.com/todo/todos/Angie_Vanegas",
         {
@@ -43,10 +46,8 @@ const ToDoList = () => {
       );
 
       if (response.ok) {
-        console.log(response);
         const postData = await response.json();
         setTasks([...tasks, { label: inputValue.label, id: postData.id }]);
-        console.log("esto es postdata.....", postData);
         setInputValue({ label: "" });
       } else {
         console.log("No se puede crear");
@@ -63,14 +64,12 @@ const ToDoList = () => {
         }
       );
       if (response.ok) {
-        console.log("esto es response.....", response);
       } else {
         throw new Error("No se pudo borrar la tarea");
       }
       const data = await response.json();
       const newTasksList = tasks.filter((task) => task.id !== id);
       setTasks(newTasksList);
-      console.log(data);
     } catch (e) {
       console.log(e);
     }
@@ -79,10 +78,25 @@ const ToDoList = () => {
   function handleRemove(removeTask) {
     deletePost(removeTask);
     const deleteTask = tasks.filter((task) => {
-      console.log("este elementttoooo", task);
       return task.id !== removeTask;
     });
     setTasks(deleteTask);
+  }
+
+  async function handleDeleteAllTasks() {
+    try {
+      const response = await fetch(
+        "https://playground.4geeks.com/todo/users/Angie_Vanegas"
+      );
+      const data = await response.json();
+      const tasks = data.todos;
+      for (const task of tasks) {
+        await deletePost(task.id);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+    getInfo("");
   }
 
   return (
@@ -127,6 +141,7 @@ const ToDoList = () => {
           )}
         </ol>
       </div>
+      <button onClick={handleDeleteAllTasks}>Remove all tasks</button>
     </div>
   );
 };
