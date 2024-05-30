@@ -111,7 +111,7 @@ const ToDoList = () => {
         onKeyDown={handleKeyDown}
       />
       <div>
-        {tasks.length === 0 ? (
+        {tasks?.length === 0 ? (
           <div className="alert alert-info" role="alert">
             No hay tareas, añadir tareas
           </div>
