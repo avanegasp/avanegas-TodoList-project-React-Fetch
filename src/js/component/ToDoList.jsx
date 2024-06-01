@@ -12,8 +12,38 @@ const ToDoList = () => {
       const response = await fetch(
         "https://playground.4geeks.com/todo/users/Angie_Vanegas"
       );
-      const data = await response.json();
-      setTasks(data.todos);
+      if (response.ok) {
+        const data = await response.json();
+        setTasks(data.todos);
+      } else if (response.status === 404) {
+        console.log("Usuario no encontrado");
+        await createUser();
+      } else {
+        console.log("Error");
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async function createUser() {
+    try {
+      const response = await fetch(
+        "https://playground.4geeks.com/todo/users/Angie_Vanegas",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ label: inputValue.label }),
+        }
+      );
+      if (response.ok) {
+        console.log("Usuario creado exitosamente");
+        await getInfo();
+      } else {
+        console.log("Error al crear el usuario");
+      }
     } catch (e) {
       console.log(e);
     }
@@ -67,7 +97,7 @@ const ToDoList = () => {
       } else {
         throw new Error("No se pudo borrar la tarea");
       }
-      const data = await response.json();
+      // const data = await response.json();
       const newTasksList = tasks.filter((task) => task.id !== id);
       setTasks(newTasksList);
     } catch (e) {
