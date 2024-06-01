@@ -117,7 +117,7 @@ const ToDoList = () => {
           </div>
         ) : null}
         <ol className="list-group">
-          {tasks.map((task) => (
+          {tasks?.map((task) => (
             <li className="fontList list-group-item" key={task.id}>
               <div className="task-container">
                 <span className="task-text">{task.label}</span>
@@ -130,13 +130,13 @@ const ToDoList = () => {
               </div>
             </li>
           ))}
-          {tasks.length === 0 ? (
+          {tasks?.length === 0 ? (
             <div>
               <span className="numberLeft"></span>
             </div>
           ) : (
             <div>
-              <span className="numberLeft">{tasks.length} Item left</span>
+              <span className="numberLeft">{tasks?.length} Item left</span>
             </div>
           )}
         </ol>
